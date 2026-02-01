@@ -1,5 +1,9 @@
 import { Client, GatewayIntentBits, Events, PermissionsBitField } from "discord.js";
 import { getJson } from "./prompts";
+import mute from "./actions/mute";
+import ban from "./actions/ban";
+import kick from "./actions/kick";
+import addRole from "./actions/add-role";
 
 //const clientID = process.env.DISCORD_CLIENT_ID;
 // const clientSecret = process.env.DISCORD_SECRET;
@@ -31,42 +35,79 @@ client.on(Events.MessageCreate, async (message) => {
     const response = await getJson(message.content);
     for (const entry of response) {
       if (entry.action == "mute") {
-        const target = await message.guild!.members.fetch(entry.user);
-        if (target.manageable) {
-          target.permissions.remove([PermissionsBitField.Flags.SendMessages]); // TODO: need testing
-        } else {
-          await message.channel.send("You cannot mute this user.");
+        try {
+          const target = await message.guild!.members.fetch(entry.user);
+          const muted = await mute(target, entry);
+          if (muted) {
+            await message.channel.send(entry.message);
+          } else {
+            await message.channel.send("You cannot mute this user.");
+          }
+        } catch (error) {
+          await message.channel.send("Error occurred while trying to mute this user.");
         }
       }
 
       if (entry.action == "ban") {
-        const target = await message.guild!.members.fetch(entry.user);
-        if (target.bannable) {
-          await target.ban({
-            reason: entry.cause,
-          });
-          await message.channel.send(entry.message);
-        } else {
-          await message.channel.send("You cannot ban this user.");
+        try {
+          const target = await message.guild!.members.fetch(entry.user);
+          const banned = await ban(target, entry);
+          if (banned) {
+            await message.channel.send(entry.message);
+          } else {
+            await message.channel.send("You cannot ban this user.");
+          }
+        } catch (error) {
+          await message.channel.send("Error occurred while trying to ban this user.");
         }
       }
 
       if (entry.action == "kick") {
-        const target = await message.guild!.members.fetch(entry.user);
-        if (target.kickable) {
-          target.kick(entry.cause)
-          await message.channel.send(entry.message);
-        } else {
-          await message.channel.send("You cannot kick this user.");
+        try {
+          const target = await message.guild!.members.fetch(entry.user);
+          const kicked = await kick(target, entry);
+          if (kicked) {
+            await message.channel.send(entry.message);
+          } else {
+            await message.channel.send("You cannot kick this user.");
+          }
+        } catch (error) {
+          await message.channel.send("Error occurred while trying to kick this user.");
         }
       }
 
       if (entry.action == "add_role") {
-        await message.channel.send(entry.message);
+        try {
+          const target = await message.guild!.members.fetch(entry.user);
+          const roleAdded = await addRole({
+            entry, guild: message.guild!,
+            member: target
+          })
+          if (roleAdded) {
+            await message.channel.send(entry.message);
+          } else {
+            await message.channel.send("You cannot add this role.");
+          }
+        } catch (error) {
+          await message.channel.send("Error occurred while trying to add role to this user.");
+        }
       }
 
       if (entry.action == "remove_role") {
-        await message.channel.send(entry.message);
+        try {
+          const target = await message.guild!.members.fetch(entry.user);
+          const roleAdded = await addRole({
+            entry, guild: message.guild!,
+            member: target
+          })
+          if (roleAdded) {
+            await message.channel.send(entry.message);
+          } else {
+            await message.channel.send("You cannot remove this role.");
+          }
+        } catch (error) {
+          await message.channel.send("Error occurred while trying to remove role to this user.");
+        }
       }
 
       if (entry.action == "none") {
