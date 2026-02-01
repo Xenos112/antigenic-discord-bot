@@ -12,8 +12,9 @@
       devShells.${system}.default = pkgs.mkShell {
         buildInputs = with pkgs; [
           bun
-          nodejs_22
+          nodejs
           prisma
+          prisma-engines
           openssl
         ];
         

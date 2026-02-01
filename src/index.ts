@@ -5,15 +5,13 @@ import ban from "./actions/ban";
 import kick from "./actions/kick";
 import addRole from "./actions/add-role";
 
-//const clientID = process.env.DISCORD_CLIENT_ID;
-// const clientSecret = process.env.DISCORD_SECRET;
 const clientToken = process.env.DISCORD_TOKEN;
 
 const client = new Client({
   intents: [
-    GatewayIntentBits.Guilds,           // Required for the bot to function in servers
-    GatewayIntentBits.GuildMessages,    // Required to receive messages in servers
-    GatewayIntentBits.MessageContent    // Required to read the content of messages
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.GuildMessages,
+    GatewayIntentBits.MessageContent
   ]
 });
 
