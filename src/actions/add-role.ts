@@ -1,5 +1,6 @@
-import type { Guild, GuildMember } from "discord.js";
+import type { ColorResolvable, Guild, GuildMember } from "discord.js";
 import type { JSONResponse } from "../types";
+import generateRandomHexColor from "../utils/random-hexcolor";
 
 type AddRoleProps = {
   member: GuildMember,
@@ -13,7 +14,7 @@ export default async function addRole({ member, guild, entry }: AddRoleProps) {
     guild.roles.create({
       name: entry.role,
       colors: {
-        primaryColor: "Red"
+        primaryColor: generateRandomHexColor() as ColorResolvable
       },
     })
   }
