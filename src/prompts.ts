@@ -19,9 +19,9 @@ function getUserMessageType(message: string, history: string[]) {
   - If user is asking about permissions, you can return "chat", but if he demands one service, you need to return the service
   - If 
   # Rules
-  - You are only allowed to respond with one string, only one
-  - You can't ask basic questions, you can only respond with one string, only one
-  - You can only respond with "chat", "mute", "kick", "ban", "add role", "remove role", dont return with quotes
+  - You are only allowed to respond with one array, only one
+  - You can't ask basic questions, you can only respond with one array, only one
+  - You can only respond with an array formated in json with "chat", "mute", "kick", "ban", "add_role", "remove_role"
 
     User message: ${message}
     History: ${history.join("\n")}

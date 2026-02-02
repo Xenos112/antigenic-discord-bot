@@ -26,17 +26,17 @@ client.on(Events.MessageCreate, async (messageContext) => {
     const urls = urlParser(messageContext.content);
     const preProcessedPrompt = await preProcessPrompt(messageContext.content, []);
 
-    switch (preProcessedPrompt) {
-      case "chat":
-        chat(messageContext, urls);
-        break;
-      default:
-
-        chat(messageContext);
-        break;
+    for (const type in preProcessedPrompt) {
+      switch (type) {
+        case "chat":
+          chat(messageContext, urls);
+          break;
+        default:
+          chat(messageContext, urls);
+          break;
+      }
     }
   }
-
 });
 
 
