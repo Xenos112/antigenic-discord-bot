@@ -1,4 +1,4 @@
-import { Client, GatewayIntentBits, Events, PermissionsBitField } from "discord.js";
+import { Client, GatewayIntentBits, Events } from "discord.js";
 import { getJson } from "./prompts";
 import mute from "./actions/mute";
 import ban from "./actions/ban";
