@@ -9,6 +9,18 @@ function urlParser(message: string) {
   return [];
 }
 
+function imgUrlParser(message: string) {
+  const imgUrlRegex = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/gi;
+  const imgUrls = message.match(imgUrlRegex);
+
+  if (imgUrls) {
+    return imgUrls
+  }
+
+  return [];
+}
+
 export {
-  urlParser
+  urlParser,
+  imgUrlParser
 }
