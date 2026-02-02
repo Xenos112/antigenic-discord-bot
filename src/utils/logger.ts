@@ -13,8 +13,7 @@ class Logger {
   }
 
   info(message: string) {
-    this.log(`${chalk.blue('[INFO]')} ${message}`);
-    this.log(`${chalk.blue(`[ERROR][${this.fileName}]`)} ${message}`);
+    this.log(`${chalk.blue(`[INFO][${this.fileName}]`)} ${message}`);
   }
 
   warn(message: string) {
