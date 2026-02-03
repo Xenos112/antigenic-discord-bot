@@ -6,7 +6,7 @@ import Logger from "../utils/logger";
 
 const logger = new Logger(import.meta.url)
 
-export default async function chat(messageContext: OmitPartialGroupDMChannel<Message<boolean>>, urls: string[]) {
+export default async function chat(messageContext: OmitPartialGroupDMChannel<Message<boolean>>, history: string[]) {
   const response = await processPrompt(messageContext.content);
 
   if (response) {
@@ -19,8 +19,7 @@ export default async function chat(messageContext: OmitPartialGroupDMChannel<Mes
       model: "gpt-oss:120b",
       messages: [{
         role: "user",
-        content: customChatPromptMaker(messageContext.content, []),  // TODO: add history
-        images: urls
+        content: customChatPromptMaker(messageContext.content, history),
       }],
       stream: false,
     });
