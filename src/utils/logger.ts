@@ -21,7 +21,7 @@ class Logger {
   }
 
   debug(message: string) {
-    this.log(`${chalk.magenta(`[INFO][${this.fileName}]`)} ${message}`);
+    this.log(`${chalk.magenta(`[DEBUG][${this.fileName}]`)} ${message}`);
   }
 }
 
