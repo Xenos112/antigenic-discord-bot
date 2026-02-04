@@ -3,6 +3,7 @@ import type { MessageContext } from "../types";
 import Logger from "../utils/logger";
 import ollama from '../utils/ollama'
 import tryCatch from "../utils/try-catch";
+import { requireModerator } from "../utils/permissions";
 
 type KickUserProps = {
   user: string;
@@ -12,6 +13,12 @@ type KickUserProps = {
 const logger = new Logger(import.meta.url);
 
 export default async function kick(messageContext: MessageContext, history: string[] = []) {
+  const permissionCheck = requireModerator(messageContext);
+  if (!permissionCheck.allowed) {
+    await messageContext.channel.send(permissionCheck.message!);
+    return;
+  }
+
   const guild = messageContext.guild!;
 
   const { data: response, error: sendingRequestError } = await tryCatch(ollama.chat({
@@ -42,11 +49,13 @@ export default async function kick(messageContext: MessageContext, history: stri
       continue;
     }
 
-    const { error: kickError } = await tryCatch(member.kick())
-    if (!member || member.user.bot || !member.kickable || guild) {
+    if (!member.kickable || member.user.bot) {
       await messageContext.channel.send("You can't kick this user");
-      continue
-    } else if (kickError) {
+      continue;
+    }
+
+    const { error: kickError } = await tryCatch(member.kick())
+    if (kickError) {
       logger.error(`Error kicking user ${entry.user}: ${kickError}`);
       await messageContext.channel.send("Error when kicking user, please try again later");
       continue;

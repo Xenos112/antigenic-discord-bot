@@ -6,6 +6,7 @@ import { addRolesPromptMaker } from "../prompts";
 import tryCatch from "../utils/try-catch";
 import delay from "../utils/delay";
 import type { MessageContext } from "../types";
+import { requireModerator } from "../utils/permissions";
 
 type AddRoleProps = {
   user: string;
@@ -17,6 +18,12 @@ type AddRoleProps = {
 const logger = new Logger(import.meta.url);
 
 export default async function addRole(messageContext: MessageContext, history: string[] = []): Promise<boolean | undefined> {
+  const permissionCheck = requireModerator(messageContext);
+  if (!permissionCheck.allowed) {
+    await messageContext.channel.send(permissionCheck.message!);
+    return false;
+  }
+
   logger.debug("Sending a custom role prompt");
 
   const { data: response, error } = await tryCatch(
@@ -34,7 +41,7 @@ export default async function addRole(messageContext: MessageContext, history: s
   if (error || !response.message.content) {
     logger.error(`Error: ${error}`);
     await messageContext.channel.send("Something went wrong, please try again later");
-    return;
+    return false;
   }
 
   logger.debug(`Json response from ollama: ${response.message.content}`);
@@ -57,7 +64,7 @@ export default async function addRole(messageContext: MessageContext, history: s
       const { error: createError, data: createdRole } = await tryCatch(
         guild.roles.create({
           name: entry.role,
-          colors: { primaryColor: generateRandomHexColor() as ColorResolvable },
+          color: generateRandomHexColor() as ColorResolvable,
         })
       );
 
@@ -73,7 +80,7 @@ export default async function addRole(messageContext: MessageContext, history: s
 
     const { error: addError } = await tryCatch(member.roles.add(role))
     if (addError) {
-      logger.error(`Error adding role ${entry.role} to user ${entry.user}: ${error}`);
+      logger.error(`Error adding role ${entry.role} to user ${entry.user}: ${addError}`);
       continue;
     }
     logger.debug("Added Role");

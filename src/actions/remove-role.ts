@@ -3,6 +3,7 @@ import Logger from "../utils/logger";
 import { addRolesPromptMaker } from "../prompts";
 import tryCatch from "../utils/try-catch";
 import type { MessageContext } from "../types";
+import { requireModerator } from "../utils/permissions";
 
 type RemoveRoleProps = {
   user: string;
@@ -13,7 +14,13 @@ type RemoveRoleProps = {
 
 const logger = new Logger(import.meta.url);
 
-export default async function addRole(messageContext: MessageContext, history: string[] = []): Promise<boolean | undefined> {
+export default async function removeRole(messageContext: MessageContext, history: string[] = []): Promise<boolean | undefined> {
+  const permissionCheck = requireModerator(messageContext);
+  if (!permissionCheck.allowed) {
+    await messageContext.channel.send(permissionCheck.message!);
+    return false;
+  }
+
   logger.debug("Sending a custom role prompt");
 
   const { data: response, error } = await tryCatch(
@@ -31,7 +38,7 @@ export default async function addRole(messageContext: MessageContext, history: s
   if (error || !response.message.content) {
     logger.error(`Error: ${error}`);
     await messageContext.channel.send("Something went wrong, please try again later");
-    return;
+    return false;
   }
 
   const returnedData = JSON.parse(response.message.content) as RemoveRoleProps[];
@@ -47,7 +54,6 @@ export default async function addRole(messageContext: MessageContext, history: s
     let role = guild.roles.cache.find((r) => r.name === entry.role);
 
     if (!role) {
-      logger
       logger.debug(`Role Does not exist ${entry.role}`);
       await messageContext.channel.send("Role does not exist");
       continue;

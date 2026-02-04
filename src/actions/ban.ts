@@ -3,6 +3,7 @@ import type { MessageContext } from "../types";
 import Logger from "../utils/logger";
 import ollama from '../utils/ollama'
 import tryCatch from "../utils/try-catch";
+import { requireModerator } from "../utils/permissions";
 
 type BanUserProps = {
   user: string;
@@ -12,6 +13,12 @@ type BanUserProps = {
 const logger = new Logger(import.meta.url);
 
 export default async function ban(messageContext: MessageContext, history: string[] = []) {
+  const permissionCheck = requireModerator(messageContext);
+  if (!permissionCheck.allowed) {
+    await messageContext.channel.send(permissionCheck.message!);
+    return;
+  }
+
   const guild = messageContext.guild!;
 
   const { data: response, error: sendingRequestError } = await tryCatch(ollama.chat({
@@ -43,11 +50,13 @@ export default async function ban(messageContext: MessageContext, history: strin
       continue;
     }
 
-    const { error: banError } = await tryCatch(member.ban())
-    if (!member || member.user.bot || !member.bannable || guild) {
+    if (!member.bannable || member.user.bot) {
       await messageContext.channel.send("You can't ban this user");
-      continue
-    } else if (banError) {
+      continue;
+    }
+
+    const { error: banError } = await tryCatch(member.ban())
+    if (banError) {
       logger.error(`Error banning user ${entry.user}: ${banError}`);
       await messageContext.channel.send("Error when banning user, please try again later");
       continue;

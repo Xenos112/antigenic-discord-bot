@@ -3,6 +3,7 @@ import type { MessageContext } from "../types";
 import Logger from "../utils/logger";
 import ollama from '../utils/ollama'
 import tryCatch from "../utils/try-catch";
+import { requireModerator } from "../utils/permissions";
 
 type MuteUserProps = {
   user: string;
@@ -13,6 +14,12 @@ type MuteUserProps = {
 const logger = new Logger(import.meta.url);
 
 export default async function mute(messageContext: MessageContext, history: string[] = []) {
+  const permissionCheck = requireModerator(messageContext);
+  if (!permissionCheck.allowed) {
+    await messageContext.channel.send(permissionCheck.message!);
+    return;
+  }
+
   const guild = messageContext.guild!;
 
   const { data: response, error: sendingRequestError } = await tryCatch(ollama.chat({
@@ -43,11 +50,13 @@ export default async function mute(messageContext: MessageContext, history: stri
       continue;
     }
 
-    const { error: muteError } = await tryCatch(member.timeout(entry.timeout * 1000))
-    if (!member || member.user.bot || !member.moderatable || guild) {
+    if (!member.moderatable || member.user.bot) {
       await messageContext.channel.send("You can't mute this user");
-      continue
-    } else if (muteError) {
+      continue;
+    }
+
+    const { error: muteError } = await tryCatch(member.timeout(entry.timeout * 1000))
+    if (muteError) {
       logger.error(`Error muting user ${entry.user}: ${muteError}`);
       await messageContext.channel.send("Error when muting user, please try again later");
       continue;
