@@ -3,6 +3,7 @@ import chat from "./actions/chat";
 import preProcessPrompt from "./pre_process_prompt";
 import Logger from "./utils/logger";
 import addRole from "./actions/add-role";
+import ban from "./actions/ban";
 
 const clientToken = process.env.DISCORD_TOKEN;
 const logger = new Logger(import.meta.url)
@@ -39,6 +40,8 @@ client.on(Events.MessageCreate, async (messageContext) => {
         chat(messageContext, history);
       if (type === 'add_role')
         addRole(messageContext, history);
+      if (type === 'ban')
+        ban(messageContext, history);
     })
   }
 });
