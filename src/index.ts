@@ -22,7 +22,8 @@ const client = new Client({
 
 
 client.on(Events.ClientReady, (client) => {
-  logger.info(`Logged in as ${client.user?.tag}!`);
+  logger.info(`Bot successfully logged in as ${client.user?.tag}`);
+  logger.info(`Connected to ${client.guilds.cache.size} guild(s)`);
 });
 
 client.on(Events.MessageCreate, async (messageContext) => {
@@ -32,13 +33,15 @@ client.on(Events.MessageCreate, async (messageContext) => {
 
   if (isMentioned || isReplyToBot) {
     messageContext.channel.sendTyping();
-    logger.debug(`Saved to history and start pre-processing prompt`);
+    logger.info(`Processing message from ${messageContext.author.username} in guild: ${messageContext.guild?.name}`);
+    logger.debug(`Message content: ${messageContext.content}`);
     history.push(`${messageContext.author.username}: ${messageContext.content}`);
 
     const preProcessedPrompt = await preProcessPrompt(messageContext.content, history.slice(-5));
-    logger.debug(`Pre-processed prompt: ${preProcessedPrompt}`);
+    logger.debug(`Detected action types: ${JSON.stringify(preProcessedPrompt)}`);
 
     preProcessedPrompt.forEach(type => {
+      logger.debug(`Executing action: ${type}`);
       if (type === 'chat')
         chat(messageContext, history);
       if (type === 'add_role')

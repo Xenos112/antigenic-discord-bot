@@ -7,14 +7,16 @@ import ollama from "../../utils/ollama";
 const logger = new Logger(import.meta.url)
 
 export default async function chat(messageContext: MessageContext, history: string[]) {
+  logger.debug(`Processing chat request from ${messageContext.author.username}`);
+
   const response = await processPrompt(messageContext.content);
 
   if (response) {
-    logger.debug("Used registered prompt");
+    logger.debug("Using cached response from database");
     messageContext.channel.send(response);
     return;
   } else {
-    logger.debug("Register new Prompt");
+    logger.debug("No cached response found, generating new AI response");
     const aiResponse = await ollama.chat({
       model: "gpt-oss:120b",
       messages: [{
@@ -24,6 +26,7 @@ export default async function chat(messageContext: MessageContext, history: stri
       stream: false,
     });
 
+    logger.debug("Saving new AI response to database");
     const newChatResponse = await addNewChatResponse(messageContext.content, aiResponse.message.content);
     messageContext.channel.send(newChatResponse.response);
   }
