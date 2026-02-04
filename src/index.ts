@@ -1,7 +1,7 @@
 import { Client, GatewayIntentBits, Events } from "discord.js";
 import preProcessPrompt from "./pre_process_prompt";
 import Logger from "./utils/logger";
-import { addRole, ban, chat, kick } from "./actions";
+import { addRole, ban, chat, kick, mute } from "./actions";
 
 const clientToken = process.env.DISCORD_TOKEN;
 const logger = new Logger(import.meta.url)
@@ -42,6 +42,8 @@ client.on(Events.MessageCreate, async (messageContext) => {
         ban(messageContext, history);
       if (type === 'kick')
         kick(messageContext, history);
+      if (type === 'mute')
+        mute(messageContext, history);
     })
   }
 });

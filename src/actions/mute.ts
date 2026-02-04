@@ -1,12 +1,59 @@
-import { type GuildMember } from 'discord.js'
-import { type JSONResponse } from '../types'
+import { mutePromptMaker } from "../prompts";
+import type { MessageContext } from "../types";
+import Logger from "../utils/logger";
+import ollama from '../utils/ollama'
+import tryCatch from "../utils/try-catch";
 
-export default async function mute(member: GuildMember, entry: JSONResponse[number]): Promise<boolean> {
-  if (member.manageable) {
-    const timeMuted = entry.time * 60 * 1000;
-    await member.timeout(timeMuted, entry.cause)
-    return true
-  } else {
-    return false
+type MuteUserProps = {
+  user: string;
+  message: string;
+  timeout: number;
+};
+
+const logger = new Logger(import.meta.url);
+
+export default async function mute(messageContext: MessageContext, history: string[] = []) {
+  const guild = messageContext.guild!;
+
+  const { data: response, error: sendingRequestError } = await tryCatch(ollama.chat({
+    model: "gpt-oss:120b",
+    messages: [
+      {
+        role: "user",
+        content: mutePromptMaker(messageContext.content, history),
+      },
+    ],
+  })
+  )
+
+
+  if (sendingRequestError) {
+    logger.error(`Error: ${sendingRequestError}`);
+    await messageContext.channel.send("Something went wrong, please try again later");
+    return;
+  }
+  const returnedData = JSON.parse(response.message.content) as MuteUserProps[];
+
+  for (const entry of returnedData) {
+    const { data: member, error } = await tryCatch(guild.members.fetch(entry.user))
+
+    if (error || !member) {
+      logger.error(`User ${entry.user} not found in guild ${guild.name}`);
+      await messageContext.channel.send("User not found in guild");
+      continue;
+    }
+
+    const { error: muteError } = await tryCatch(member.timeout(entry.timeout * 1000))
+    if (!member || member.user.bot || !member.moderatable || guild) {
+      await messageContext.channel.send("You can't mute this user");
+      continue
+    } else if (muteError) {
+      logger.error(`Error muting user ${entry.user}: ${muteError}`);
+      await messageContext.channel.send("Error when muting user, please try again later");
+      continue;
+    }
+
+    logger.debug("muted User");
+    await messageContext.channel.send(entry.message);
   }
 }
