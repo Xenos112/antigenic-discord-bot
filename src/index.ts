@@ -1,7 +1,12 @@
 import { Client, GatewayIntentBits, Events } from "discord.js";
 import preProcessPrompt from "./pre_process_prompt";
 import Logger from "./utils/logger";
-import { addRole, ban, chat, kick, mute, removeRole } from "./actions";
+import chat from "./features/chat";
+import ban from "./features/ban";
+import kick from "./features/kick";
+import mute from "./features/mute";
+import addRole from "./features/add-role";
+import removeRole from "./features/remove-role";
 
 const clientToken = process.env.DISCORD_TOKEN;
 const logger = new Logger(import.meta.url)

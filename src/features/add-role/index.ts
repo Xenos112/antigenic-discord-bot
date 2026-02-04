@@ -1,19 +1,18 @@
 import type { ColorResolvable } from "discord.js";
-import ollama from "../utils/ollama";
-import Logger from "../utils/logger";
-import generateRandomHexColor from "../utils/random-hexcolor";
-import { addRolesPromptMaker } from "../prompts";
-import tryCatch from "../utils/try-catch";
-import delay from "../utils/delay";
-import type { MessageContext } from "../types";
-import { requireModerator } from "../utils/permissions";
+import ollama from "../../utils/ollama";
+import Logger from "../../utils/logger";
+import generateRandomHexColor from "../../utils/random-hexcolor";
+import { addRolesPromptMaker } from "./prompts";
+import tryCatch from "../../utils/try-catch";
+import delay from "../../utils/delay";
+import type { MessageContext } from "../../types";
+import { requireModerator } from "../../utils/permissions";
 
 type AddRoleProps = {
   user: string;
   role: string;
   message: string;
 };
-
 
 const logger = new Logger(import.meta.url);
 

@@ -1,16 +1,15 @@
-import ollama from "../utils/ollama";
-import Logger from "../utils/logger";
-import { addRolesPromptMaker } from "../prompts";
-import tryCatch from "../utils/try-catch";
-import type { MessageContext } from "../types";
-import { requireModerator } from "../utils/permissions";
+import ollama from "../../utils/ollama";
+import Logger from "../../utils/logger";
+import { removeRolesPromptMaker } from "./prompts";
+import tryCatch from "../../utils/try-catch";
+import type { MessageContext } from "../../types";
+import { requireModerator } from "../../utils/permissions";
 
 type RemoveRoleProps = {
   user: string;
   role: string;
   message: string;
 };
-
 
 const logger = new Logger(import.meta.url);
 
@@ -29,7 +28,7 @@ export default async function removeRole(messageContext: MessageContext, history
       messages: [
         {
           role: "user",
-          content: addRolesPromptMaker(messageContext.content, history),
+          content: removeRolesPromptMaker(messageContext.content, history),
         },
       ],
     })
@@ -59,9 +58,9 @@ export default async function removeRole(messageContext: MessageContext, history
       continue;
     }
 
-    const { error: addError } = await tryCatch(member.roles.remove(role))
-    if (addError) {
-      logger.error(`Error removing role ${entry.role} to user ${entry.user}: ${error}`);
+    const { error: removeError } = await tryCatch(member.roles.remove(role))
+    if (removeError) {
+      logger.error(`Error removing role ${entry.role} from user ${entry.user}: ${removeError}`);
       continue;
     }
     logger.debug("removed Role");

@@ -1,9 +1,9 @@
-import { kickPromptMaker } from "../prompts";
-import type { MessageContext } from "../types";
-import Logger from "../utils/logger";
-import ollama from '../utils/ollama'
-import tryCatch from "../utils/try-catch";
-import { requireModerator } from "../utils/permissions";
+import { kickPromptMaker } from "./prompts";
+import type { MessageContext } from "../../types";
+import Logger from "../../utils/logger";
+import ollama from '../../utils/ollama'
+import tryCatch from "../../utils/try-catch";
+import { requireModerator } from "../../utils/permissions";
 
 type KickUserProps = {
   user: string;
@@ -31,7 +31,6 @@ export default async function kick(messageContext: MessageContext, history: stri
     ],
   })
   )
-
 
   if (sendingRequestError) {
     logger.error(`Error: ${sendingRequestError}`);

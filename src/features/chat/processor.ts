@@ -1,6 +1,6 @@
-import Logger from "./utils/logger";
-import prisma from "./utils/prisma";
-import tryCatch from "./utils/try-catch";
+import Logger from "../../utils/logger";
+import prisma from "../../utils/prisma";
+import tryCatch from "../../utils/try-catch";
 
 type PromptResponsePair = {
   id: string;
@@ -65,7 +65,6 @@ function getSimilarity(userPrompt: string, databasePrompt: string) {
   return similarity;
 }
 
-// FIX: for now fetching all chats from the database
 async function fetchDataBasePrompts() {
   logger.debug(`Fetching all prompts`);
   if (cachedPromptResponsePair.length > 0) {

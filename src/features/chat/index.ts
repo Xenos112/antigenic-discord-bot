@@ -1,5 +1,5 @@
-import { addNewChatResponse, processPrompt } from "../../process_prompt";
-import { customChatPromptMaker } from "../../prompts";
+import { addNewChatResponse, processPrompt } from "./processor";
+import { customChatPromptMaker } from "./prompts";
 import type { MessageContext } from "../../types";
 import Logger from "../../utils/logger";
 import ollama from "../../utils/ollama";
@@ -29,3 +29,4 @@ export default async function chat(messageContext: MessageContext, history: stri
   }
 }
 
+export { customChatPromptMaker, getUserMessageType } from "./prompts";

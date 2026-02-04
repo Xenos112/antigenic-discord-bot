@@ -1,5 +1,5 @@
 import ollama from "./utils/ollama";
-import { getUserMessageType } from "./prompts";
+import { getUserMessageType } from "./features/chat";
 import Logger from "./utils/logger";
 
 const logger = new Logger(import.meta.url)
