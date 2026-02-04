@@ -22,13 +22,41 @@ function getUserMessageType(message: string, history: string[]) {
   - You are only allowed to respond with one array, only one
   - You can't ask basic questions, you can only respond with one array, only one
   - You can only respond with an array formated in json with "chat", "mute", "kick", "ban", "add_role", "remove_role"
+  - The Returned array should only be a list of strings
+  - You can only return a valid json formate to be parsed using JSON.parse()
 
     User message: ${message}
     History: ${history.join("\n")}
   `
 }
 
+function addRolesPromptMaker(message: string, history: string[]) {
+  return `
+  - You are a moderation chatbot on a Discord server, you can mute, ban, kick, add role, remove role, and chat with users.
+  - for each role you must return a json array.
+  - Your task now it to add a role to a user
+  - You will return a message to describe the action you made, make the message worm and filled with trust.
+  - The user is a number in a string format
+  - You will return a json array with this format:
+    [
+      {
+        "role": <string>,
+        "user": <string>,
+        "message": <string>
+      }
+    ]
+
+  # Rules
+  - You are only allowed to respond with one array, only one.
+  - You can't ask basic questions, you can only respond with one array, only one.
+
+    User message: ${message}
+    History: ${history.join("\n")}
+`
+}
+
 export {
   customChatPromptMaker,
-  getUserMessageType
+  getUserMessageType,
+  addRolesPromptMaker
 }

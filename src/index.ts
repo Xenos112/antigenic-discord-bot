@@ -1,8 +1,8 @@
 import { Client, GatewayIntentBits, Events } from "discord.js";
 import chat from "./actions/chat";
 import preProcessPrompt from "./pre_process_prompt";
-import { urlParser } from "./parsers";
 import Logger from "./utils/logger";
+import addRole from "./actions/add-role";
 
 const clientToken = process.env.DISCORD_TOKEN;
 const logger = new Logger(import.meta.url)
@@ -12,7 +12,7 @@ const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
     GatewayIntentBits.GuildMessages,
-    GatewayIntentBits.MessageContent
+    GatewayIntentBits.MessageContent,
   ]
 });
 
@@ -32,16 +32,14 @@ client.on(Events.MessageCreate, async (messageContext) => {
     history.push(`${messageContext.author.username}: ${messageContext.content}`);
 
     const preProcessedPrompt = await preProcessPrompt(messageContext.content, history.slice(-5));
-    for (const type in preProcessedPrompt) {
-      switch (type) {
-        case "chat":
-          chat(messageContext, history);
-          break;
-        default:
-          chat(messageContext, history);
-          break;
-      }
-    }
+    logger.debug(`Pre-processed prompt: ${preProcessedPrompt}`);
+
+    preProcessedPrompt.forEach(type => {
+      if (type === 'chat')
+        chat(messageContext, history);
+      if (type === 'add_role')
+        addRole(messageContext, history);
+    })
   }
 });
 
