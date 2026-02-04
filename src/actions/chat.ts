@@ -1,12 +1,12 @@
-import type { Message, OmitPartialGroupDMChannel } from "discord.js";
 import ollama from "../utils/ollama";
 import { addNewChatResponse, processPrompt } from "../process_prompt";
 import { customChatPromptMaker } from "../prompts";
 import Logger from "../utils/logger";
+import type { MessageContext } from "../types";
 
 const logger = new Logger(import.meta.url)
 
-export default async function chat(messageContext: OmitPartialGroupDMChannel<Message<boolean>>, history: string[]) {
+export default async function chat(messageContext: MessageContext, history: string[]) {
   const response = await processPrompt(messageContext.content);
 
   if (response) {

@@ -5,6 +5,7 @@ import generateRandomHexColor from "../utils/random-hexcolor";
 import { addRolesPromptMaker } from "../prompts";
 import tryCatch from "../utils/try-catch";
 import delay from "../utils/delay";
+import type { MessageContext } from "../types";
 
 type AddRoleProps = {
   user: string;
@@ -12,7 +13,6 @@ type AddRoleProps = {
   message: string;
 };
 
-type MessageContext = OmitPartialGroupDMChannel<Message<boolean>>;
 
 const logger = new Logger(import.meta.url);
 

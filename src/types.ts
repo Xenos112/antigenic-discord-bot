@@ -1,3 +1,5 @@
+import type { OmitPartialGroupDMChannel, Message } from "discord.js";
+
 export type Type = "mute" | "ban" | "kick" | "add_role" | "remove_role" | "none"
 
 export type JSONResponse = Array<{
@@ -9,3 +11,6 @@ export type JSONResponse = Array<{
   user: string,
   role: string
 }>
+
+
+export type MessageContext = OmitPartialGroupDMChannel<Message<boolean>>;
