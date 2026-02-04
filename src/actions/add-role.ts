@@ -1,4 +1,4 @@
-import type { ColorResolvable, Message, OmitPartialGroupDMChannel } from "discord.js";
+import type { ColorResolvable } from "discord.js";
 import ollama from "../utils/ollama";
 import Logger from "../utils/logger";
 import generateRandomHexColor from "../utils/random-hexcolor";
